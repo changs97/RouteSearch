@@ -2,8 +2,10 @@ package com.changs.routesearch
 
 import android.app.Application
 import com.naver.maps.map.NaverMapSdk
+import dagger.hilt.android.HiltAndroidApp
 import timber.log.Timber
 
+@HiltAndroidApp
 class RouteSearchApplication: Application() {
     override fun onCreate() {
         super.onCreate()
