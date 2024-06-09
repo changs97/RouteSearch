@@ -22,6 +22,7 @@ android {
         }
 
         buildConfigField("String","NAVER_CLIENT_ID", gradleLocalProperties(rootDir, providers).getProperty("NAVER_CLIENT_ID"))
+        buildConfigField("String","TMAP_APP_KEY", gradleLocalProperties(rootDir, providers).getProperty("TMAP_APP_KEY"))
     }
 
     buildTypes {
