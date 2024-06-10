@@ -3,6 +3,8 @@ package com.changs.routesearch.data.model
 import com.google.gson.annotations.SerializedName
 
 data class Poi(
+    @SerializedName("id")
+    val id: String,
     @SerializedName("adminDongCode")
     val adminDongCode: String,
     @SerializedName("bizName")
@@ -29,8 +31,6 @@ data class Poi(
     val frontLat: String,
     @SerializedName("frontLon")
     val frontLon: String,
-    @SerializedName("id")
-    val id: String,
     @SerializedName("legalDongCode")
     val legalDongCode: String,
     @SerializedName("lowerAddrName")
@@ -76,3 +76,13 @@ data class Poi(
     @SerializedName("zipCode")
     val zipCode: String
 )
+
+fun Poi.toPoiInfo(): PoiInfo {
+    return PoiInfo(
+        id = this.id,
+        lat = this.frontLat,
+        lon = this.noorLon,
+        name = this.name,
+        timestamp = System.currentTimeMillis()
+    )
+}

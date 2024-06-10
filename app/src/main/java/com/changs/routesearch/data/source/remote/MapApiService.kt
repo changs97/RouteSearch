@@ -3,6 +3,7 @@ package com.changs.routesearch.data.source.remote
 import com.changs.routesearch.data.model.PoiInfoApiModel
 import com.changs.routesearch.data.model.RoutesApiModel
 import com.changs.routesearch.data.model.RoutesRequestBody
+import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
@@ -10,7 +11,7 @@ import retrofit2.http.Query
 
 interface MapApiService {
     @GET("/tmap/pois")
-    suspend fun getPois(
+    fun getPois(
         @Query("version") version: Int = 1,
         @Query("searchType") searchType: String = "all",
         @Query("areaLLCode") areaLLCode: String? = null,
@@ -26,10 +27,10 @@ interface MapApiService {
         @Query("multiPoint") multiPoint: String = "Y",
         @Query("poiGroupYn") poiGroupYn: String = "N",
         @Query("searchKeyword") searchKeyword: String,
-    ): PoiInfoApiModel
+    ): Response<PoiInfoApiModel>
 
     @POST("/tmap/routes/pedestrian")
-    suspend fun postRoutes(
+    fun postRoutes(
         @Query("version") version: Int = 1, @Body body: RoutesRequestBody
-    ): RoutesApiModel
+    ): Response<RoutesApiModel>
 }
