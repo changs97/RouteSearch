@@ -1,5 +1,6 @@
 package com.changs.routesearch.data.source.remote
 
+import com.changs.routesearch.data.model.PoiInfoApiModel
 import com.changs.routesearch.data.model.RoutesApiModel
 import com.changs.routesearch.data.model.RoutesRequestBody
 import retrofit2.http.Body
@@ -25,7 +26,7 @@ interface MapApiService {
         @Query("multiPoint") multiPoint: String = "Y",
         @Query("poiGroupYn") poiGroupYn: String = "N",
         @Query("searchKeyword") searchKeyword: String,
-    ): RoutesApiModel
+    ): PoiInfoApiModel
 
     @POST("/tmap/routes/pedestrian")
     suspend fun postRoutes(
