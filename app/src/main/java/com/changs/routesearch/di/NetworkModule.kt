@@ -1,6 +1,7 @@
 package com.changs.routesearch.di
 
 import com.changs.routesearch.BuildConfig
+import com.changs.routesearch.data.source.remote.MapApiService
 import com.changs.routesearch.util.Constant.CONNECT_TIME_OUT
 import com.changs.routesearch.util.Constant.READ_TIME_OUT
 import com.changs.routesearch.util.Constant.TMAP_BASE_URL
@@ -55,5 +56,11 @@ object NetworkModule {
     fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit {
         return Retrofit.Builder().baseUrl(TMAP_BASE_URL).client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create()).build()
+    }
+
+    @Singleton
+    @Provides
+    fun provideMapApiService(retrofit: Retrofit): MapApiService {
+        return retrofit.create(MapApiService::class.java)
     }
 }

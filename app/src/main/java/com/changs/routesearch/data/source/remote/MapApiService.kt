@@ -11,7 +11,7 @@ import retrofit2.http.Query
 
 interface MapApiService {
     @GET("/tmap/pois")
-    fun getPois(
+    suspend fun getPois(
         @Query("version") version: Int = 1,
         @Query("searchType") searchType: String = "all",
         @Query("areaLLCode") areaLLCode: String? = null,
@@ -27,10 +27,10 @@ interface MapApiService {
         @Query("multiPoint") multiPoint: String = "Y",
         @Query("poiGroupYn") poiGroupYn: String = "N",
         @Query("searchKeyword") searchKeyword: String,
-    ): Response<PoiInfoApiModel>
+    ): PoiInfoApiModel
 
     @POST("/tmap/routes/pedestrian")
-    fun postRoutes(
+    suspend fun postRoutes(
         @Query("version") version: Int = 1, @Body body: RoutesRequestBody
-    ): Response<RoutesApiModel>
+    ): RoutesApiModel
 }
