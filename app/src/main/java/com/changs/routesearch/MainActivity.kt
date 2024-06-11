@@ -1,14 +1,17 @@
 package com.changs.routesearch
 
 import android.os.Bundle
+import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
+import com.changs.routesearch.ui.compose.RouteSearchApp
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-
+        setContent {
+            RouteSearchApp(fragmentManager = supportFragmentManager)
+        }
     }
 }

@@ -116,6 +116,9 @@ dependencies {
     annotationProcessor("androidx.room:room-compiler:$room_version")
     kapt("androidx.room:room-compiler:$room_version")
     implementation("androidx.room:room-ktx:$room_version")
+
+    // Compose ViewBinding
+    implementation("androidx.compose.ui:ui-viewbinding:1.3.0")
 }
 
 kapt {
