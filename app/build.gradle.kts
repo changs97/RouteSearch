@@ -119,6 +119,9 @@ dependencies {
 
     // Compose ViewBinding
     implementation("androidx.compose.ui:ui-viewbinding:1.3.0")
+
+    // Location
+    implementation("com.google.android.gms:play-services-location:21.0.1")
 }
 
 kapt {

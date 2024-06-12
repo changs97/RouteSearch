@@ -8,4 +8,7 @@ object Constant {
 
     // database
     const val DATABASE_NAME = "TMAP_DATABASE"
+
+    // request code
+    const val LOCATION_PERMISSION_REQUEST_CODE = 1000
 }
