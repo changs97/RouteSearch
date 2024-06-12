@@ -15,10 +15,37 @@ fun RouteSearchApp(fragmentManager: FragmentManager) {
 
         NavHost(navController = navController, startDestination = "home") {
             composable("home") {
-                Home(fragmentManager) {
+                HomeScreen(supportFragmentManager = fragmentManager) {
                     // click event 처리
                     Timber.d("Search bar was clicked")
+                    navController.navigate("search")
                 }
+            }
+
+            composable("search") {
+                SearchScreen(
+                    onBackClick = {
+                    navController.popBackStack()
+                }, onDeparturesClick = {
+                    navController.navigate("detail")
+                }, onArrivalsClick = {
+                    navController.navigate("detail")
+                }, onCompleteClick = {
+                    navController.navigate("route")
+                })
+            }
+
+            composable("detail") {
+                SearchDetailScreen(onBackClick = {
+                    navController.popBackStack()
+                }, onSearch = {
+
+                }, recentSearches = listOf(), searchResults = listOf()
+                )
+            }
+
+            composable("route") {
+                RouteScreen(supportFragmentManager = fragmentManager)
             }
         }
     }

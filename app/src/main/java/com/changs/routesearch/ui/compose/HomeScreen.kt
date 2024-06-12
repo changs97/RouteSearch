@@ -9,8 +9,9 @@ import androidx.fragment.app.FragmentManager
 import com.changs.routesearch.databinding.HomeContainerBinding
 
 @Composable
-fun Home(
-    supportFragmentManager: FragmentManager, onSearchBarClicked: () -> Unit
+fun HomeScreen(
+    supportFragmentManager: FragmentManager,
+    onSearchBarClicked: () -> Unit
 ) {
     val lifecycle = LocalLifecycleOwner.current
     val currentOnSearchBarClicked by rememberUpdatedState(newValue = onSearchBarClicked)

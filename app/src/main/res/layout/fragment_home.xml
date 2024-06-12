@@ -16,9 +16,15 @@
     <TextView
         android:id="@+id/home_txt_search_bar"
         android:layout_width="0dp"
-        android:layout_height="50dp"
-        android:text="검색"
-        android:background="@color/white"
+        android:layout_height="wrap_content"
+        android:layout_margin="20dp"
+        android:padding="12dp"
+        android:drawableStart="@drawable/ic_search"
+        android:drawablePadding="8dp"
+        android:text="어디로 갈까요?"
+        android:textStyle="bold"
+        android:textColor="@color/gray"
+        android:background="@drawable/background_home_search_bar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/home_map_view" />
