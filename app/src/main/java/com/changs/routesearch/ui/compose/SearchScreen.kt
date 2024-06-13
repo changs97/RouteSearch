@@ -29,19 +29,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.changs.routesearch.ui.MapViewModel
-
+import com.changs.routesearch.ui.SearchViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchScreen(
-    mapViewModel: MapViewModel,
+    searchViewModel: SearchViewModel,
     onBackClick: () -> Unit,
     onDeparturesClick: () -> Unit,
     onArrivalsClick: () -> Unit,
     onCompleteClick: () -> Unit
 ) {
-    val routeUiState by mapViewModel.routeUiState.collectAsState()
+    val routeUiState by searchViewModel.routeUiState.collectAsState()
 
     Scaffold(topBar = {
         CenterAlignedTopAppBar(
@@ -54,7 +53,7 @@ fun SearchScreen(
                 IconButton(onClick = onBackClick) {
                     Icon(
                         imageVector = Icons.Filled.ArrowBack,
-                        contentDescription = "Localized description"
+                        contentDescription = "Back"
                     )
                 }
             },

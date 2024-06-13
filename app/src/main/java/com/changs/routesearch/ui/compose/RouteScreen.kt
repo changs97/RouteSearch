@@ -10,20 +10,20 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.commit
 import androidx.fragment.app.replace
-import com.changs.routesearch.ui.MapViewModel
 import com.changs.routesearch.R
-import com.changs.routesearch.ui.RouteFragment
 import com.changs.routesearch.databinding.RouteContainerBinding
+import com.changs.routesearch.ui.RouteFragment
+import com.changs.routesearch.ui.SearchViewModel
 
 @Composable
 fun RouteScreen(
     supportFragmentManager: FragmentManager,
-    mapViewModel: MapViewModel,
+    searchViewModel: SearchViewModel,
     onBackClick: () -> Unit,
 ) {
     val lifecycle = LocalLifecycleOwner.current
     val currentOnBackClicked by rememberUpdatedState(newValue = onBackClick)
-    val routeUiState by mapViewModel.routeUiState.collectAsState()
+    val routeUiState by searchViewModel.routeUiState.collectAsState()
 
     AndroidViewBinding(factory = { inflater, parent, attachToParent ->
         supportFragmentManager.setFragmentResultListener(
