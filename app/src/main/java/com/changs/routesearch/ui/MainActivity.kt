@@ -1,4 +1,4 @@
-package com.changs.routesearch
+package com.changs.routesearch.ui
 
 import android.os.Bundle
 import androidx.activity.compose.setContent

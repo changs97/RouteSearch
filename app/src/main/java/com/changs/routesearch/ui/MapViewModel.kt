@@ -1,4 +1,4 @@
-package com.changs.routesearch
+package com.changs.routesearch.ui
 
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.ViewModel

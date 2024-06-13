@@ -10,9 +10,9 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.commit
 import androidx.fragment.app.replace
-import com.changs.routesearch.MapViewModel
+import com.changs.routesearch.ui.MapViewModel
 import com.changs.routesearch.R
-import com.changs.routesearch.RouteFragment
+import com.changs.routesearch.ui.RouteFragment
 import com.changs.routesearch.databinding.RouteContainerBinding
 
 @Composable

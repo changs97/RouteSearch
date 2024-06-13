@@ -34,7 +34,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.changs.routesearch.MapViewModel
+import com.changs.routesearch.ui.MapViewModel
 import com.changs.routesearch.util.formatMonthDay
 
 @OptIn(ExperimentalMaterial3Api::class)

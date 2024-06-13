@@ -8,7 +8,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.changs.routesearch.MapViewModel
+import com.changs.routesearch.ui.MapViewModel
 import com.changs.routesearch.ui.theme.RouteSearchTheme
 
 @Composable

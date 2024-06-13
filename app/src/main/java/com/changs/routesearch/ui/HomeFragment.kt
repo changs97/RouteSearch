@@ -1,4 +1,4 @@
-package com.changs.routesearch
+package com.changs.routesearch.ui
 
 import android.Manifest
 import android.content.pm.PackageManager
