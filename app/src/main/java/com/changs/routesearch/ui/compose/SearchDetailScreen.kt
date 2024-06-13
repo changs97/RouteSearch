@@ -14,12 +14,14 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -38,8 +40,7 @@ import com.changs.routesearch.util.formatMonthDay
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchDetailScreen(
-    mapViewModel: MapViewModel,
-    type: String, onBackClick: () -> Unit
+    mapViewModel: MapViewModel, type: String, onBackClick: () -> Unit
 ) {
     val searchUiState by mapViewModel.searchUiState.collectAsState()
 
@@ -49,93 +50,117 @@ fun SearchDetailScreen(
 
     val keyboardController = LocalSoftwareKeyboardController.current
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-    ) {
-        TopAppBar(title = { Text(text = "검색") }, navigationIcon = {
-            IconButton(onClick = {
-                mapViewModel.updateSearchText(TextFieldValue(""))
-                onBackClick()
-            }) {
-                Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Back")
-            }
-        }, modifier = Modifier.fillMaxWidth()
-        )
-
-        OutlinedTextField(
-            value = searchUiState.searchText,
-            onValueChange = {
-                mapViewModel.updateSearchText(it)
+    Scaffold(topBar = {
+        CenterAlignedTopAppBar(
+            title = {
+                Text(
+                    "검색",
+                )
             },
-            label = { Text("Search...") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp),
-            singleLine = true,
-            keyboardOptions = KeyboardOptions.Default.copy(
-                imeAction = ImeAction.Search
-            ),
-            keyboardActions = KeyboardActions(onSearch = {
-                mapViewModel.addRecentSearch()
-                keyboardController?.hide()
-            })
+            navigationIcon = {
+                IconButton(onClick = {
+                    mapViewModel.updateSearchText(TextFieldValue(""))
+                    onBackClick()
+                }) {
+                    Icon(
+                        imageVector = Icons.Filled.ArrowBack,
+                        contentDescription = "Localized description"
+                    )
+                }
+            },
         )
+    }, content = { paddingValues ->
+        Surface(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp)
+            ) {
 
-        if (searchUiState.searchText.text.isEmpty()) {
-            Text(
-                text = "최근 검색", modifier = Modifier.padding(vertical = 8.dp)
-            )
+                OutlinedTextField(value = searchUiState.searchText,
+                    onValueChange = {
+                        mapViewModel.updateSearchText(it)
+                    },
+                    label = { Text("장소, 주소 검색") },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp),
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions.Default.copy(
+                        imeAction = ImeAction.Search
+                    ),
+                    keyboardActions = KeyboardActions(onSearch = {
+                        mapViewModel.addRecentSearch()
+                        keyboardController?.hide()
+                    })
+                )
 
-            LazyColumn {
-                items(searchUiState.recentSearchs) { search ->
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 8.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Column {
-                            Text(text = search.name, fontSize = 18.sp, color = Color.Black)
-                            Text(
-                                text = formatMonthDay(search.timestamp),
-                                fontSize = 14.sp,
-                                color = Color.Gray
-                            )
-                        }
-                        IconButton(onClick = {
-                            mapViewModel.deleteRecentSearch(search.name)
-                        }) {
-                            Icon(imageVector = Icons.Filled.Clear, contentDescription = "Delete")
+                if (searchUiState.searchText.text.isEmpty()) {
+                    Text(
+                        text = "최근 검색", modifier = Modifier.padding(vertical = 8.dp)
+                    )
+
+                    LazyColumn {
+                        items(searchUiState.recentSearchs) { search ->
+                            Row(modifier = Modifier
+                                .clickable {
+                                    mapViewModel.updateSearchText(TextFieldValue(search.name))
+                                }
+                                .fillMaxWidth()
+                                .padding(vertical = 8.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically) {
+                                Text(text = search.name, fontSize = 18.sp, color = Color.Black)
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Text(
+                                        text = formatMonthDay(search.timestamp),
+                                        fontSize = 14.sp,
+                                        color = Color.Gray
+                                    )
+
+                                    IconButton(onClick = {
+                                        mapViewModel.deleteRecentSearch(search.name)
+                                    }) {
+                                        Icon(
+                                            imageVector = Icons.Filled.Clear,
+                                            contentDescription = "Delete"
+                                        )
+                                    }
+                                }
+                            }
                         }
                     }
-                }
-            }
-        } else {
-            Text(
-                text = "검색 결과", modifier = Modifier.padding(vertical = 8.dp)
-            )
+                } else {
+                    Text(
+                        text = "검색 결과", modifier = Modifier.padding(vertical = 8.dp)
+                    )
 
-            LazyColumn {
-                items(searchUiState.regionSearchs) { result ->
-                    Column(modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 8.dp)
-                        .clickable {
-                            if (type == "departures") {
-                                mapViewModel.updateDepartureLocation(result)
-                            } else {
-                                mapViewModel.updateDestinationLocation(result)
+                    LazyColumn {
+                        items(searchUiState.regionSearchs) { result ->
+                            Column(modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 8.dp)
+                                .clickable {
+                                    if (type == "departures") {
+                                        mapViewModel.updateDepartureLocation(result)
+                                    } else {
+                                        mapViewModel.updateDestinationLocation(result)
+                                    }
+                                    mapViewModel.addRecentSearch()
+                                    mapViewModel.updateSearchText(TextFieldValue(""))
+                                    onBackClick()
+                                }) {
+                                Text(text = result.name, fontSize = 18.sp, color = Color.Black)
                             }
-                            mapViewModel.updateSearchText(TextFieldValue(""))
-                            onBackClick()
-                        }) {
-                        Text(text = result.name, fontSize = 18.sp, color = Color.Black)
+                        }
                     }
                 }
             }
         }
-    }
+    })
+
 }
