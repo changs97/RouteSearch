@@ -53,7 +53,7 @@ fun SearchScreen(
                 IconButton(onClick = onBackClick) {
                     Icon(
                         imageVector = Icons.Filled.ArrowBack,
-                        contentDescription = "Localized description"
+                        contentDescription = "Back"
                     )
                 }
             },
