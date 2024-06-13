@@ -1,14 +1,12 @@
 package com.changs.routesearch.data.model
 
-import androidx.room.Entity
-import androidx.room.PrimaryKey
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 
-@Entity(tableName = "poi")
+@Parcelize
 data class PoiInfo(
-    @PrimaryKey
     val id: String,
     val lat: String,
     val lon: String,
-    val name: String,
-    val timestamp: Long
-)
+    val name: String
+) : Parcelable

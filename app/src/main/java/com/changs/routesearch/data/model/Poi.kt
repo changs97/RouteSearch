@@ -82,7 +82,6 @@ fun Poi.toPoiInfo(): PoiInfo {
         id = this.id,
         lat = this.frontLat,
         lon = this.noorLon,
-        name = this.name,
-        timestamp = System.currentTimeMillis()
+        name = this.name
     )
 }

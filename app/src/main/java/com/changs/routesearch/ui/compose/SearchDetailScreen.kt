@@ -1,16 +1,19 @@
 package com.changs.routesearch.ui.compose
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -18,109 +21,121 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-
-data class SearchResult(val name: String, val address: String)
+import com.changs.routesearch.MapViewModel
+import com.changs.routesearch.util.formatMonthDay
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchDetailScreen(
-    onBackClick: () -> Unit,
-    onSearch: (String) -> Unit,
-    recentSearches: List<String>,
-    searchResults: List<SearchResult>
+    mapViewModel: MapViewModel,
+    type: String, onBackClick: () -> Unit
 ) {
-    var searchQuery by remember { mutableStateOf("") }
+    val searchUiState by mapViewModel.searchUiState.collectAsState()
 
-    Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
-        TopAppBar(
-            title = { Text(text = "검색") },
-            navigationIcon = {
-                IconButton(onClick = onBackClick) {
-                    Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Back")
-                }
-            },
-            modifier = Modifier.fillMaxWidth()
+    LaunchedEffect(key1 = searchUiState.searchText) {
+        mapViewModel.searchRegions()
+    }
+
+    val keyboardController = LocalSoftwareKeyboardController.current
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+    ) {
+        TopAppBar(title = { Text(text = "검색") }, navigationIcon = {
+            IconButton(onClick = {
+                mapViewModel.updateSearchText(TextFieldValue(""))
+                onBackClick()
+            }) {
+                Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Back")
+            }
+        }, modifier = Modifier.fillMaxWidth()
         )
 
         OutlinedTextField(
-            value = searchQuery,
+            value = searchUiState.searchText,
             onValueChange = {
-                searchQuery = it
-                onSearch(it)
+                mapViewModel.updateSearchText(it)
             },
             label = { Text("Search...") },
-            modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp),
+            singleLine = true,
+            keyboardOptions = KeyboardOptions.Default.copy(
+                imeAction = ImeAction.Search
+            ),
+            keyboardActions = KeyboardActions(onSearch = {
+                mapViewModel.addRecentSearch()
+                keyboardController?.hide()
+            })
         )
 
-        Text(
-            text = "Recent Searches",
-            modifier = Modifier.padding(vertical = 8.dp)
-        )
+        if (searchUiState.searchText.text.isEmpty()) {
+            Text(
+                text = "최근 검색", modifier = Modifier.padding(vertical = 8.dp)
+            )
 
-        LazyColumn {
-            items(recentSearches) { search ->
-                Text(
-                    text = search,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { searchQuery = search; onSearch(search) }
-                        .padding(vertical = 8.dp)
-                )
+            LazyColumn {
+                items(searchUiState.recentSearchs) { search ->
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column {
+                            Text(text = search.name, fontSize = 18.sp, color = Color.Black)
+                            Text(
+                                text = formatMonthDay(search.timestamp),
+                                fontSize = 14.sp,
+                                color = Color.Gray
+                            )
+                        }
+                        IconButton(onClick = {
+                            mapViewModel.deleteRecentSearch(search.name)
+                        }) {
+                            Icon(imageVector = Icons.Filled.Clear, contentDescription = "Delete")
+                        }
+                    }
+                }
             }
-        }
+        } else {
+            Text(
+                text = "검색 결과", modifier = Modifier.padding(vertical = 8.dp)
+            )
 
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Text(
-            text = "Search Results",
-            modifier = Modifier.padding(vertical = 8.dp)
-        )
-
-        LazyColumn {
-            items(searchResults) { result ->
-                Column(
-                    modifier = Modifier
+            LazyColumn {
+                items(searchUiState.regionSearchs) { result ->
+                    Column(modifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = 8.dp)
-                ) {
-                    Text(text = result.name, fontSize = 18.sp, color = Color.Black)
-                    Text(text = result.address, fontSize = 14.sp, color = Color.Gray)
+                        .clickable {
+                            if (type == "departures") {
+                                mapViewModel.updateDepartureLocation(result)
+                            } else {
+                                mapViewModel.updateDestinationLocation(result)
+                            }
+                            mapViewModel.updateSearchText(TextFieldValue(""))
+                            onBackClick()
+                        }) {
+                        Text(text = result.name, fontSize = 18.sp, color = Color.Black)
+                    }
                 }
             }
         }
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun SearchDetailScreenPreview() {
-    val recentSearches = listOf("Search 1", "Search 2", "Search 3", "Search 4", "Search 5")
-    val searchResults = listOf(
-        SearchResult(name = "Place 1", address = "Address 1"),
-        SearchResult(name = "Place 2", address = "Address 2"),
-        SearchResult(name = "Place 3", address = "Address 3"),
-        SearchResult(name = "Place 4", address = "Address 4"),
-        SearchResult(name = "Place 5", address = "Address 5"),
-        SearchResult(name = "Place 6", address = "Address 6"),
-        SearchResult(name = "Place 7", address = "Address 7"),
-        SearchResult(name = "Place 8", address = "Address 8"),
-        SearchResult(name = "Place 9", address = "Address 9"),
-        SearchResult(name = "Place 10", address = "Address 10")
-    )
-
-    SearchDetailScreen(
-        onBackClick = {},
-        onSearch = {},
-        recentSearches = recentSearches,
-        searchResults = searchResults
-    )
 }

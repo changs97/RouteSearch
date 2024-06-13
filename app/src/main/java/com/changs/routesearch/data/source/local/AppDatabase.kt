@@ -4,12 +4,12 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.changs.routesearch.data.model.PoiInfo
+import com.changs.routesearch.data.model.RecentSearch
 import com.changs.routesearch.util.Constant.DATABASE_NAME
 
-@Database(entities = [PoiInfo::class], version = 1, exportSchema = false)
+@Database(entities = [RecentSearch::class], version = 1, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
-    abstract fun poiInfoDao(): PoiInfoDao
+    abstract fun mapSearchDao(): MapSearchDao
 
     companion object {
 

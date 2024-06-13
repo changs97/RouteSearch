@@ -22,22 +22,27 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.changs.routesearch.ui.theme.RouteSearchTheme
+import com.changs.routesearch.MapViewModel
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchScreen(
+    mapViewModel: MapViewModel,
     onBackClick: () -> Unit,
     onDeparturesClick: () -> Unit,
     onArrivalsClick: () -> Unit,
     onCompleteClick: () -> Unit
 ) {
+    val routeUiState by mapViewModel.routeUiState.collectAsState()
+
     Scaffold(topBar = {
         CenterAlignedTopAppBar(
             title = {
@@ -72,16 +77,22 @@ fun SearchScreen(
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     PlaceSearchButton(
-                        text = "출발지", onClick = onDeparturesClick
+                        text = routeUiState.departureLocation?.name ?: "출발지",
+                        onClick = onDeparturesClick
                     )
 
                     PlaceSearchButton(
-                        text = "도착지", onClick = onArrivalsClick
+                        text = routeUiState.destinationLocation?.name ?: "도착지",
+                        onClick = onArrivalsClick
                     )
                 }
 
                 Button(
-                    onClick = onCompleteClick,
+                    onClick = {
+                        if (routeUiState.departureLocation != null && routeUiState.destinationLocation != null) {
+                            onCompleteClick()
+                        }
+                    },
                     shape = RoundedCornerShape(8.dp),
                     modifier = Modifier
                         .fillMaxWidth()
@@ -92,20 +103,6 @@ fun SearchScreen(
             }
         }
     })
-}
-
-
-@Preview
-@Composable
-private fun SearchScreenContentPreview() {
-    RouteSearchTheme {
-        Surface {
-            SearchScreen(onBackClick = {},
-                onDeparturesClick = {},
-                onArrivalsClick = {},
-                onCompleteClick = {})
-        }
-    }
 }
 
 @Composable

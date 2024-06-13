@@ -2,7 +2,7 @@ package com.changs.routesearch.di
 
 import android.content.Context
 import com.changs.routesearch.data.source.local.AppDatabase
-import com.changs.routesearch.data.source.local.PoiInfoDao
+import com.changs.routesearch.data.source.local.MapSearchDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -21,7 +21,7 @@ class DatabaseModule {
     }
 
     @Provides
-    fun providePoiInfoDao(appDatabase: AppDatabase): PoiInfoDao {
-        return appDatabase.poiInfoDao()
+    fun provideMapSearchDao(appDatabase: AppDatabase): MapSearchDao {
+        return appDatabase.mapSearchDao()
     }
 }
