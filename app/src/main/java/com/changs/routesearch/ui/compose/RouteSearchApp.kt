@@ -8,14 +8,14 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.changs.routesearch.ui.MapViewModel
+import com.changs.routesearch.ui.SearchViewModel
 import com.changs.routesearch.ui.theme.RouteSearchTheme
 
 @Composable
 fun RouteSearchApp(fragmentManager: FragmentManager) {
     RouteSearchTheme {
         val navController = rememberNavController()
-        val mapViewModel: MapViewModel = hiltViewModel()
+        val searchViewModel: SearchViewModel = hiltViewModel()
 
         NavHost(navController = navController, startDestination = "home") {
             composable("home") {
@@ -25,7 +25,7 @@ fun RouteSearchApp(fragmentManager: FragmentManager) {
             }
 
             composable("search") {
-                SearchScreen(mapViewModel, onBackClick = {
+                SearchScreen(searchViewModel, onBackClick = {
                     navController.popBackStack()
                 }, onDeparturesClick = {
                     navController.navigate("detail/departures")
@@ -41,7 +41,7 @@ fun RouteSearchApp(fragmentManager: FragmentManager) {
                 arguments = listOf(navArgument("type") { type = NavType.StringType })
             ) { backStackEntry ->
                 val type = backStackEntry.arguments?.getString("type") ?: "departures"
-                SearchDetailScreen(mapViewModel, type) {
+                SearchDetailScreen(searchViewModel, type) {
                     navController.popBackStack()
                 }
             }
@@ -49,7 +49,7 @@ fun RouteSearchApp(fragmentManager: FragmentManager) {
             composable("route") {
                 RouteScreen(
                     supportFragmentManager = fragmentManager,
-                    mapViewModel
+                    searchViewModel = searchViewModel
                 ) {
                     navController.navigate("home") {
                         popUpTo(navController.graph.id) {

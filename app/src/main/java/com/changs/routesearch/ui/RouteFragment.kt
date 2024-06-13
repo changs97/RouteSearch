@@ -17,7 +17,6 @@ import com.naver.maps.geometry.LatLngBounds
 import com.naver.maps.map.CameraUpdate
 import com.naver.maps.map.MapView
 import com.naver.maps.map.NaverMap
-import com.naver.maps.map.OnMapReadyCallback
 import com.naver.maps.map.overlay.InfoWindow
 import com.naver.maps.map.overlay.Marker
 import com.naver.maps.map.overlay.PathOverlay
@@ -27,17 +26,13 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class RouteFragment : Fragment(), OnMapReadyCallback {
+class RouteFragment : Fragment() {
     private var _binding: FragmentRouteBinding? = null
     private val binding get() = _binding!!
 
-    private val mapViewModel: MapViewModel by viewModels()
-
-    private var departureLocation: PoiInfo? = null
-    private var destinationLocation: PoiInfo? = null
+    private val routeViewModel: RouteViewModel by viewModels()
 
     private lateinit var mapView: MapView
-    private lateinit var naverMap: NaverMap
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -57,60 +52,49 @@ class RouteFragment : Fragment(), OnMapReadyCallback {
             )
         }
 
-        mapView.getMapAsync(this)
+        mapView.getMapAsync { naverMap ->
+            viewLifecycleOwner.lifecycleScope.launch {
+                repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                    routeViewModel.pathPoints.collectLatest { coords ->
+                        if (coords.size >= 2) {
+                            val path = PathOverlay()
+                            path.coords = coords
+                            path.map = naverMap
 
-        viewLifecycleOwner.lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                mapViewModel.pathPoints.collectLatest {
-                    if (it.isNotEmpty() && mapViewModel.routeUiState.value.departureLocation != null) {
-                        addMarker(
-                            mapViewModel.routeUiState.value.departureLocation!!,
-                            "출발지: ${mapViewModel.routeUiState.value.departureLocation!!.name}"
-                        )
-                        addMarker(
-                            mapViewModel.routeUiState.value.destinationLocation!!,
-                            "도착지: ${mapViewModel.routeUiState.value.destinationLocation!!.name}"
-                        )
+                            val bounds = LatLngBounds.Builder()
+                            bounds.include(coords)
 
-                        val path = PathOverlay()
-                        path.coords = it
-                        path.map = naverMap
+                            val cameraUpdate = CameraUpdate.fitBounds(bounds.build(), 300)
 
-                        val bounds = LatLngBounds.Builder()
-                        bounds.include(it)
-
-                        val cameraUpdate =
-                            CameraUpdate.fitBounds(bounds.build(), 300) // padding을 조정할 수 있습니다.
-                        naverMap.moveCamera(cameraUpdate)
-                    }
-
-
-                }
-            }
-        }
-
-        arguments?.let {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                departureLocation = it.getParcelable("departureLocation", PoiInfo::class.java)
-                destinationLocation = it.getParcelable("destinationLocation", PoiInfo::class.java)
-            } else {
-                departureLocation = it.getParcelable("departureLocation")
-                destinationLocation = it.getParcelable("destinationLocation")
-            }
-
-            if (departureLocation != null && destinationLocation != null) {
-                mapViewModel.updateDepartureLocation(departureLocation!!)
-                mapViewModel.updateDestinationLocation(destinationLocation!!)
-
-                viewLifecycleOwner.lifecycleScope.launch {
-                    repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                        mapViewModel.routeUiState.collectLatest {
-                            if (it.departureLocation != null && it.destinationLocation != null) {
-                                mapViewModel.getRoutes()
-                            }
+                            naverMap.moveCamera(cameraUpdate)
                         }
                     }
+                }
+            }
 
+            arguments?.let {
+                routeViewModel.run {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        departureLocation =
+                            it.getParcelable("departureLocation", PoiInfo::class.java)
+                        destinationLocation =
+                            it.getParcelable("destinationLocation", PoiInfo::class.java)
+                    } else {
+                        departureLocation = it.getParcelable("departureLocation")
+                        destinationLocation = it.getParcelable("destinationLocation")
+                    }
+
+                    if (departureLocation != null && destinationLocation != null) {
+                        addMarker(
+                            naverMap, departureLocation!!, "출발지: ${departureLocation!!.name}"
+                        )
+
+                        addMarker(
+                            naverMap, destinationLocation!!, "도착지: ${destinationLocation!!.name}"
+                        )
+
+                        getRoutes(departureLocation!!, destinationLocation!!)
+                    }
                 }
             }
         }
@@ -152,19 +136,14 @@ class RouteFragment : Fragment(), OnMapReadyCallback {
         mapView.onLowMemory()
     }
 
-    override fun onMapReady(naverMap: NaverMap) {
-        this.naverMap = naverMap
-    }
-
-    private fun addMarker(location: PoiInfo, title: String) {
+    private fun addMarker(naverMap: NaverMap, location: PoiInfo, title: String) {
         val marker = Marker().apply {
             position = LatLng(location.lat.toDouble(), location.lon.toDouble())
             icon = MarkerIcons.BLACK
             map = naverMap
-
         }
 
-        val infoWindow = InfoWindow().apply {
+        InfoWindow().apply {
             adapter = object : InfoWindow.DefaultTextAdapter(requireContext()) {
                 override fun getText(infoWindow: InfoWindow): CharSequence {
                     return title
