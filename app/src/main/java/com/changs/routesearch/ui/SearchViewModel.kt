@@ -103,6 +103,7 @@ class SearchViewModel @Inject constructor(private val mapRepository: MapReposito
 
                         is ApiResult.Empty -> {
                             _regionSearch.value = emptyList()
+                            Timber.d("empty")
                         }
 
                         is ApiResult.Error -> {
