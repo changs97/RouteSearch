@@ -29,17 +29,18 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.changs.routesearch.ui.SearchViewModel
 import com.changs.routesearch.util.formatMonthDay
 
@@ -48,7 +49,8 @@ import com.changs.routesearch.util.formatMonthDay
 fun SearchDetailScreen(
     searchViewModel: SearchViewModel, type: String, onBackClick: () -> Unit
 ) {
-    val searchUiState by searchViewModel.searchUiState.collectAsState()
+    val lifecycle = LocalLifecycleOwner.current
+    val searchUiState by searchViewModel.searchUiState.collectAsStateWithLifecycle(lifecycle)
 
     LaunchedEffect(key1 = searchUiState.searchText) {
         searchViewModel.searchRegions()

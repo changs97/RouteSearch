@@ -1,7 +1,6 @@
 package com.changs.routesearch.ui.compose
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.platform.LocalLifecycleOwner
@@ -10,6 +9,7 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.commit
 import androidx.fragment.app.replace
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.changs.routesearch.R
 import com.changs.routesearch.databinding.RouteContainerBinding
 import com.changs.routesearch.ui.RouteFragment
@@ -23,7 +23,7 @@ fun RouteScreen(
 ) {
     val lifecycle = LocalLifecycleOwner.current
     val currentOnBackClicked by rememberUpdatedState(newValue = onBackClick)
-    val routeUiState by searchViewModel.routeUiState.collectAsState()
+    val routeUiState by searchViewModel.routeUiState.collectAsStateWithLifecycle(lifecycle)
 
     AndroidViewBinding(factory = { inflater, parent, attachToParent ->
         supportFragmentManager.setFragmentResultListener(
