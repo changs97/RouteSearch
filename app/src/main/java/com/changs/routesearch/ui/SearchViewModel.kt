@@ -87,7 +87,6 @@ class SearchViewModel @Inject constructor(private val mapRepository: MapReposito
 
     private var searchJob: Job? = null
 
-
     fun searchRegions() {
         searchJob?.cancel()
         searchJob = viewModelScope.launch {
