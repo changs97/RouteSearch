@@ -1,6 +1,7 @@
 package com.changs.routesearch.ui.compose
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.fragment.app.FragmentManager
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavType
@@ -10,12 +11,12 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.changs.routesearch.ui.SearchViewModel
 import com.changs.routesearch.ui.theme.RouteSearchTheme
+import timber.log.Timber
 
 @Composable
 fun RouteSearchApp(fragmentManager: FragmentManager) {
     RouteSearchTheme {
         val navController = rememberNavController()
-        val searchViewModel: SearchViewModel = hiltViewModel()
 
         NavHost(navController = navController, startDestination = "home") {
             composable("home") {
@@ -24,7 +25,9 @@ fun RouteSearchApp(fragmentManager: FragmentManager) {
                 }
             }
 
-            composable("search") {
+            composable("search") { backStackEntry ->
+                val searchViewModel: SearchViewModel = hiltViewModel(backStackEntry)
+
                 SearchScreen(searchViewModel, onBackClick = {
                     navController.popBackStack()
                 }, onDeparturesClick = {
@@ -40,13 +43,23 @@ fun RouteSearchApp(fragmentManager: FragmentManager) {
                 "detail/{type}",
                 arguments = listOf(navArgument("type") { type = NavType.StringType })
             ) { backStackEntry ->
+                val parentEntry = remember(backStackEntry) {
+                    navController.getBackStackEntry("search")
+                }
+                val searchViewModel: SearchViewModel = hiltViewModel(parentEntry)
                 val type = backStackEntry.arguments?.getString("type") ?: "departures"
+
                 SearchDetailScreen(searchViewModel, type) {
                     navController.popBackStack()
                 }
             }
 
-            composable("route") {
+            composable("route") { backStackEntry ->
+                val parentEntry = remember(backStackEntry) {
+                    navController.getBackStackEntry("search")
+                }
+                val searchViewModel: SearchViewModel = hiltViewModel(parentEntry)
+
                 RouteScreen(
                     supportFragmentManager = fragmentManager,
                     searchViewModel = searchViewModel
