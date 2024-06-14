@@ -50,7 +50,6 @@ class RouteViewModel@Inject constructor(private val mapRepository: MapRepository
                     }
 
                     is ApiResult.Error -> {
-                        // send error message
                         _pathPoints.value = emptyList()
                         Timber.d("error ${result.exception} ${result.code}")
                     }
