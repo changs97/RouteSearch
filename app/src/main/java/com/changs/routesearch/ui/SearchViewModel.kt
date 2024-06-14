@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 data class RouteUiState(
@@ -86,7 +87,6 @@ class SearchViewModel @Inject constructor(private val mapRepository: MapReposito
 
     private var searchJob: Job? = null
 
-
     fun searchRegions() {
         searchJob?.cancel()
         searchJob = viewModelScope.launch {
@@ -102,11 +102,12 @@ class SearchViewModel @Inject constructor(private val mapRepository: MapReposito
 
                         is ApiResult.Empty -> {
                             _regionSearch.value = emptyList()
+                            Timber.d("empty")
                         }
 
                         is ApiResult.Error -> {
-                            // send error message
                             _regionSearch.value = emptyList()
+                            Timber.d("error ${result.exception} ${result.code}")
                         }
                     }
                 }
